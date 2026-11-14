@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grabill Road Bridge — 3D Project Model</title>
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.webgpu.js", "three/webgpu": "./vendor/three/three.webgpu.js", "three/tsl": "./vendor/three/three.tsl.js", "three/addons/": "./vendor/three/addons/" } }</script>
+</head>
+<body>
+<div id="stage"><canvas id="gl"></canvas><div id="labels"></div></div>
+
+<div id="loading"><div class="ld-box"><div class="ld-title">Grabill Road over the St. Joseph River</div><div class="ld-sub">Building the model from the contract plans…</div><div class="ld-bar"><i id="ldbar"></i></div><div id="ldmsg">loading</div></div></div>
+
+<header id="topbar" class="ui">
+  <div class="brand"><b>Grabill Road over St. Joseph River</b><span>Allen County Bridge No. 29 · INDOT Contract B-42165-A · Des. 1901712</span></div>
+  <div class="views" id="views"></div>
+  <div class="tools">
+    <button id="btnTour" class="primary" title="Play the guided tour">▶ Guided tour</button>
+    <button id="btnLabels" class="tog on" title="Dimensions and labels">Labels</button>
+    <button id="btnXray" class="tog" title="See through the concrete to the steel inside">X-ray</button>
+    <select id="selQ" title="Rendering quality (reloads the page)"><option value="low">Quality: low</option><option value="med">Quality: medium</option><option value="high">Quality: high</option></select>
+    <button id="btnDocs" title="Sources and documents">Sources</button>
+  </div>
+</header>
+
+<aside id="left" class="ui panel">
+  <nav class="tabs"><button data-tab="layers" class="on">Layers</button><button data-tab="tools">Tools</button><button data-tab="cost">Cost</button><button data-tab="project">Project</button></nav>
+  <section id="tab-layers" class="tab on"></section>
+  <section id="tab-tools" class="tab">
+    <h4>Reservoir level</h4>
+    <div class="row"><input type="range" id="water" min="762" max="782" step="0.1" value="777.7"><output id="waterOut">El. 777.7</output></div>
+    <div class="chips" id="waterChips"></div>
+    <h4>Exploded view</h4>
+    <div class="row"><input type="range" id="explode" min="0" max="1" step="0.01" value="0"><output id="explodeOut">0%</output></div>
+    <h4>Section cuts</h4>
+    <label class="chk"><input type="checkbox" id="cutX"> Cross section at station</label>
+    <div class="row"><input type="range" id="cutXv" min="-140" max="140" step="0.5" value="-32"><output id="cutXo"></output></div>
+    <label class="chk"><input type="checkbox" id="cutZ"> Longitudinal section at offset</label>
+    <div class="row"><input type="range" id="cutZv" min="-30" max="20" step="0.25" value="0.6"><output id="cutZo"></output></div>
+    <h4>Time of day</h4>
+    <div class="row"><input type="range" id="sun" min="6" max="20" step="0.1" value="15.2"><output id="sunOut"></output></div>
+    <h4>Measure</h4>
+    <button id="btnMeasure" class="tog">Click two points</button> <span id="measureOut" class="muted"></span>
+    <p class="muted small">Tip: click any part of the model for its details, quantities and plan sheets. Right-drag pans, wheel zooms.</p>
+  </section>
+  <section id="tab-cost" class="tab"></section>
+  <section id="tab-project" class="tab"></section>
+</aside>
+
+<aside id="info" class="ui panel hidden"></aside>
+
+<footer id="timeline" class="ui">
+  <div class="tl-head"><b id="tlTitle"></b><span id="tlDate"></span></div>
+  <div class="tl-track"><input type="range" id="tl" min="0" max="9" step="0.01" value="9"><div id="tlTicks"></div></div>
+  <div class="tl-btns"><button id="tlPrev">◀</button><button id="tlPlay">▶ Play sequence</button><button id="tlNext">▶</button><span id="tlNote" class="muted small"></span></div>
+</footer>
+
+<div id="tourUI" class="hidden">
+  <div id="tTitle"></div>
+  <div id="tCaption"><div id="tKicker"></div><div id="tHead"></div><div id="tBody"></div></div>
+  <div id="tStats"></div>
+  <div id="tProgress"><i></i></div>
+  <div id="tFoot">Model built from INDOT contract plans (ERI, 2024), the 1964 bridge plans, USGS 3DEP lidar and State of Indiana orthophotography</div>
+  <button id="tExit" class="ui">✕ Exit tour</button>
+</div>
+
+<div id="modal" class="hidden"><div class="mbox"><button class="mclose">✕</button><div class="mbody"></div></div></div>
+<script>
+// Interactive quality presets (the video renderer passes capture=1 and uses full quality). Explicit URL parameters win.
+(function () { const q = new URLSearchParams(location.search); if (q.has('capture')) return; const level = q.get('q') || localStorage.getItem('gbq') || 'med';
+  const P = { low: { gi: 'none', sm: 2048, csm: 3, reflres: 0.4, skyres: '2k', treenear: 350, ipr: 1, rip: 'low' }, med: { gi: 'ssgi', gis: 1, gist: 8, sm: 4096, csm: 4, reflres: 0.5, skyres: '4k', treenear: 800, ipr: 1.25 }, high: { gi: 'ssgi', gis: 2, gist: 12, sm: 8192, csm: 4, reflres: 1, skyres: '8k', treenear: 1500, ipr: 2 } }[level] || {};
+  for (const k in P) if (!q.has(k)) q.set(k, P[k]); q.set('q', level); window.__clean = location.pathname + '?q=' + level; history.replaceState(null, '', location.pathname + '?' + q.toString()); })();
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
